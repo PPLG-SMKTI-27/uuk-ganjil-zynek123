@@ -1,126 +1,72 @@
 <?php
 session_start();
 
-require_once "app/controllers/AlatController.php";
-require_once "app/controllers/PinjamController.php";
-require_once "app/controllers/AuthController.php";
-require_once "app/controllers/UserController.php";
+// Path yang benar berdasarkan debug
+$controllers_path = __DIR__ . '/app/controllers';
 
-$user = new UserController();
-$alat   = new AlatController();
-$pinjam = new PinjamController();
-$auth   = new AuthController();
+if (!is_dir($controllers_path)) {
+    die("ERROR: Folder controllers tidak ditemukan di: $controllers_path");
+}
 
-$page = $_GET['page'] ?? 'login';
+// Function untuk load controller
+function loadController($name) {
+    global $controllers_path;
+    $file = $controllers_path . '/' . $name . '.php';
+    
+    if (file_exists($file)) {
+        require_once $file;
+        
+        // Pastikan class exists
+        if (class_exists($name)) {
+            return new $name();
+        } else {
+            die("ERROR: Class $name tidak ditemukan di file: $file");
+        }
+    } else {
+        die("ERROR: Controller file tidak ditemukan: $file");
+    }
+}
 
+// Routing
+$page = $_GET['page'] ?? 'auth';
+$action = $_GET['action'] ?? 'login';
+$id = $_GET['id'] ?? null;
+
+// Tambahkan DashboardController ke routing
 switch ($page) {
-
-    // LOGIN
-    case 'login':
-        $auth->login();
+    case 'auth':
+        $controller = loadController('AuthController');
         break;
-
-    case 'prosesLogin':
-        $auth->prosesLogin();
+    case 'alat':
+        $controller = loadController('AlatController');
         break;
-
-    case 'logout':
-        $auth->logout();
+    case 'peminjaman':
+        $controller = loadController('PeminjamanController');
         break;
-
-
-    // ADMIN DASHBOARD
-    case 'dashboard_admin':
-        include "app/role/admin.php";
+    case 'user':
+        $controller = loadController('UserController');
         break;
-
-
-    // GURU DASHBOARD
-    case 'dashboard_guru':
-        include "app/role/guru.php";
+    case 'dashboard':
+        $controller = loadController('DashboardController');
         break;
-
-
-    // SISWA DASHBOARD
-    case 'dashboard_siswa':
-        include "app/role/siswa.php";
-        break;
-
-
-    // FITUR ALAT
-    case 'index':
-        $alat->index();
-        break;
-
-    case 'tambah':
-        $alat->tambah();
-        break;
-
-    case 'proses_tambah':
-        $alat->prosesTambah();
-        break;
-
-    case 'edit':
-        $alat->edit();
-        break;
-
-    case 'proses_edit':
-        $alat->prosesEdit();
-        break;
-
-    case 'hapus':
-        $alat->hapus();
-        break;
-
-
-    // FITUR PINJAM
-    case 'pinjam':
-        $pinjam->index();
-        break;
-
-    case 'tambah_pinjam':
-        $pinjam->pinjam();
-        break;
-
-    case 'proses_pinjam':
-        $pinjam->prosesPinjam();
-        break;
-
-    case 'kembalikan':
-        $pinjam->kembalikan();
-        break;
-
-    case 'hapus_pinjam':
-        $pinjam->hapus();
-        break;
-
-    // BUHAN USER
-    case 'kelola_user':
-    $user->index();
-    break;
-
-    case 'tambah_user':
-    $user->tambah();
-    break;
-
-    case 'proses_tambah_user':
-    $user->prosesTambah();
-    break;
-
-    case 'edit_user':
-    $user->edit();
-    break;
-
-    case 'proses_edit_user':
-    $user->prosesEdit();
-    break;
-
-    case 'hapus_user':
-    $user->hapus();
-    break;
-
-    // 404
     default:
-        echo "<h2>404 — Halaman Tidak Ada</h2>";
+        $controller = loadController('AuthController');
+        $action = 'login';
         break;
 }
+
+// Execute action
+if ($id) {
+    if (method_exists($controller, $action)) {
+        $controller->$action($id);
+    } else {
+        $controller->index();
+    }
+} else {
+    if (method_exists($controller, $action)) {
+        $controller->$action();
+    } else {
+        $controller->index();
+    }
+}
+?>

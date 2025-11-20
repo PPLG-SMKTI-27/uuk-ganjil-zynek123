@@ -1,63 +1,52 @@
-<?php include "app/views/template/header.php"; ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #e3e3e3;
-        }
-        .box {
-            width: 350px;
-            background: white;
-            padding: 20px;
-            margin: 80px auto;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #aaa;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 8px;
-            border-radius: 6px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 15px;
-            border: none;
-            background: #4CAF50;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
 
-<div class="box">
-    <h2>Login</h2>
-    <form action="index.php?page=prosesLogin" method="POST">
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-sign-in-alt"></i> Login ke Sistem Lab</h4>
+                </div>
+                <div class="card-body">
+                    <?php if (isset($error)): ?>
+                        <div class="alert alert-danger"><?php echo $error; ?></div>
+                    <?php endif; ?>
 
-    <label>Username</label>
-    <input type="text" name="username" required>
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" required 
+                                       value="<?php echo isset($_POST['email']) ? $_POST['email'] : ''; ?>">
+                            </div>
+                        </div>
 
-    <label>Password</label>
-    <input type="password" name="password" required>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                        </div>
 
-    <label>Login Sebagai</label>
-    <select name="role" required>
-        <option value="">-- Pilih Role --</option>
-        <option value="admin">Admin</option>
-        <option value="guru">Guru</option>
-        <option value="siswa">Siswa</option>
-    </select>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </button>
+                        </div>
+                    </form>
 
-    <button type="submit">Login</button>
-</form>
+                    <div class="mt-3 text-center">
+                        <p class="mb-0">Demo Accounts:</p>
+                        <small class="text-muted">
+                            Admin: admin@lab.pplg / password<br>
+                            Guru: sari@sekolah.sch.id / password<br>
+                            Siswa: andi@siswa.sch.id / password
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-</body>
-</html>
-<?php include "app/views/template/footer.php"; ?>
